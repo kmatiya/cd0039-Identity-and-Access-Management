@@ -25,6 +25,11 @@ def get_success_response_template():
         'success': True
     }
 
+def get_formatted_short_drinks(drinks):
+    return [drink.short() for drink in drinks]
+
+def get_formatted_long_drinks(drinks):
+    return [drink.long() for drink in drinks]
 
 # ROUTES
 '''
@@ -39,7 +44,7 @@ def get_success_response_template():
 def drinks():
     drinks = Drink.query.order_by(Drink.id).all()
     response = get_success_response_template()
-    response["drinks"] = [drink.short() for drink in drinks]
+    response["drinks"] = get_formatted_short_drinks(drinks)
     return jsonify(response)
 
 '''
@@ -50,7 +55,13 @@ def drinks():
     returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
         or appropriate status code indicating reason for failure
 '''
-
+@app.route('/drinks-detail', methods=['GET'])
+#@requires_auth('get:drinks-detail')
+def get_drinks_detail():
+    drinks = Drink.query.order_by(Drink.id).all()
+    response = get_success_response_template()
+    response["drinks"] = get_formatted_long_drinks(drinks)
+    return jsonify(response)
 
 '''
 @TODO implement endpoint
