@@ -43,8 +43,11 @@ def get_formatted_long_drinks(drinks):
 @app.route('/drinks')
 def drinks():
     drinks = Drink.query.order_by(Drink.id).all()
+    formatted_drinks = get_formatted_short_drinks(drinks)
+    if len(formatted_drinks) == 0:
+        abort(404)
     response = get_success_response_template()
-    response["drinks"] = get_formatted_short_drinks(drinks)
+    response["drinks"] = formatted_drinks
     return jsonify(response)
 
 '''
@@ -59,8 +62,11 @@ def drinks():
 #@requires_auth('get:drinks-detail')
 def get_drinks_detail():
     drinks = Drink.query.order_by(Drink.id).all()
+    formatted_drinks = get_formatted_long_drinks(drinks)
+    if len(formatted_drinks) == 0:
+        abort(404)
     response = get_success_response_template()
-    response["drinks"] = get_formatted_long_drinks(drinks)
+    response["drinks"] = formatted_drinks
     return jsonify(response)
 
 '''
