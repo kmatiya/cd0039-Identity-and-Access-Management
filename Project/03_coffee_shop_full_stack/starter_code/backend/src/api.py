@@ -78,6 +78,28 @@ def get_drinks_detail():
     returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the newly created drink
         or appropriate status code indicating reason for failure
 '''
+@app.route("/drinks", methods=['POST'])
+#@requires_auth('post:drinks')
+def add_drinks():
+    request_body = request.get_json()
+
+    if not ('title' in request_body and 'recipe' in request_body):
+        abort(400)
+    title = request_body.get("title")
+    recipe = json.dumps(request_body.get("recipe"))
+    try:
+        new_drink = Drink(title=title, recipe=recipe)
+        new_drink.insert()
+        drinks = []
+        drinks.append(new_drink)
+        
+        response = get_success_response_template()
+        response['id'] = new_drink.id
+        response['drink'] = get_formatted_long_drinks[0]
+        return jsonify(response)
+
+    except:
+        abort(422)
 
 
 '''
