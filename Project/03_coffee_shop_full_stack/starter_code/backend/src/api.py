@@ -80,8 +80,8 @@ def get_drinks_detail():
         or appropriate status code indicating reason for failure
 '''
 @app.route("/drinks", methods=['POST'])
-#@requires_auth('post:drinks')
-def add_drinks():
+@requires_auth('post:drinks')
+def add_drinks(payload):
     request_body = request.get_json()
 
     if not ('title' in request_body and 'recipe' in request_body):
@@ -145,7 +145,21 @@ def patch_drink(payload, drink_id):
     returns status code 200 and json {"success": True, "delete": id} where id is the id of the deleted record
         or appropriate status code indicating reason for failure
 '''
+@app.route('/drinks/<int:drink_id>', methods=['DELETE'])
+@requires_auth('delete:drinks')
+def delete_drink(payload,drink_id):
+    drink_to_delete = Drink.query.filter(Drink.id == drink_id).one_or_none()
 
+    if drink_to_delete is None:
+        abort(404)
+    try:
+        drink_to_delete.delete()
+        response = get_success_response_template()
+        response['delete'] = drink_to_delete.id
+        return jsonify(response)
+
+    except Exception:
+        abort(422)
 
 # Error Handling
 '''
