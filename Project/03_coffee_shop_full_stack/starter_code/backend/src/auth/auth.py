@@ -23,7 +23,7 @@ class AuthError(Exception):
 ## Auth Header
 
 '''
-@TODO implement get_token_auth_header() method
+@Done implement get_token_auth_header() method
     it should attempt to get the header from the request
         it should raise an AuthError if no header is present
     it should attempt to split bearer and the token
@@ -31,7 +31,26 @@ class AuthError(Exception):
     return the token part of the header
 '''
 def get_token_auth_header():
-   raise Exception('Not Implemented')
+   # check if authorization is not in request
+    if 'Authorization' not in request.headers:
+        raise AuthError({
+            'code': 'no_authorization_header',
+            'description': 'Header does not contain authorization header'
+        }, 401)
+    # Split the authorization header
+    auth_header_parts = request.headers['Authorization'].split(' ')
+    # check if token is valid (should contain Bearer token)
+    if len(auth_header_parts) != 2:
+        raise AuthError({
+            'code': 'no_bearer_authorization_header',
+            'description': 'Header does not contain Bearer authorization'
+        }, 401)
+    elif auth_header_parts[0].lower() != 'bearer':
+        raise AuthError({
+            'code': 'no_bearer_authorization_header',
+            'description': 'Header does not contain Bearer authorization'
+        }, 401) 
+    return auth_header_parts[1]
 
 '''
 @TODO implement check_permissions(permission, payload) method
