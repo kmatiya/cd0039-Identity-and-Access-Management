@@ -1,4 +1,5 @@
 import os
+from tkinter.messagebox import NO
 from urllib import response
 from flask import Flask, request, jsonify, abort
 from sqlalchemy import exc
@@ -94,8 +95,7 @@ def add_drinks():
         drinks.append(new_drink)
         
         response = get_success_response_template()
-        response['id'] = new_drink.id
-        response['drink'] = get_formatted_long_drinks[0]
+        response['drinks'] = get_formatted_long_drinks(drinks)[0]
         return jsonify(response)
 
     except:
@@ -113,6 +113,26 @@ def add_drinks():
     returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the updated drink
         or appropriate status code indicating reason for failure
 '''
+@app.route('/drinks/<int:drink_id>', methods=['PATCH'])
+@requires_auth('patch:drinks')
+def patch_drink(payload, drink_id):
+    drink_to_update = Drink.query.get(drink_id).one_or_none()
+    if drink_to_update is None:
+        abort(404)
+    try:
+        request_body = request.get_json()
+        drink_to_update.title = request_body.get("title")
+        drink_to_update.recipe = json.dumps(request_body.get("recipe"))
+        drink_to_update.update()
+        drinks = []
+        drinks.append(drink_to_update)
+        response = get_success_response_template()
+        response['drinks'] = get_formatted_long_drinks(drinks)[0]
+        return jsonify(response)
+
+    except:
+        abort(422)
+
 
 
 '''
