@@ -60,7 +60,7 @@ def drinks():
         or appropriate status code indicating reason for failure
 '''
 @app.route('/drinks-detail', methods=['GET'])
-#@requires_auth('get:drinks-detail')
+@requires_auth('get:drinks-detail')
 def get_drinks_detail():
     drinks = Drink.query.order_by(Drink.id).all()
     formatted_drinks = get_formatted_long_drinks(drinks)
