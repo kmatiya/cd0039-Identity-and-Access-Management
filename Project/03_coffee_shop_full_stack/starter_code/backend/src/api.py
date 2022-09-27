@@ -1,6 +1,4 @@
 import os
-from tkinter.messagebox import NO
-from urllib import response
 from flask import Flask, request, jsonify, abort
 from sqlalchemy import exc
 import json
@@ -12,6 +10,7 @@ from .auth.auth import AuthError, requires_auth
 app = Flask(__name__)
 setup_db(app)
 CORS(app)
+
 
 '''
 @TODO uncomment the following line to initialize the datbase
@@ -61,7 +60,7 @@ def drinks():
 '''
 @app.route('/drinks-detail', methods=['GET'])
 @requires_auth('get:drinks-detail')
-def get_drinks_detail():
+def get_drinks_detail(payload):
     drinks = Drink.query.order_by(Drink.id).all()
     formatted_drinks = get_formatted_long_drinks(drinks)
     if len(formatted_drinks) == 0:
@@ -116,7 +115,7 @@ def add_drinks(payload):
 @app.route('/drinks/<int:drink_id>', methods=['PATCH'])
 @requires_auth('patch:drinks')
 def patch_drink(payload, drink_id):
-    drink_to_update = Drink.query.get(drink_id).one_or_none()
+    drink_to_update = Drink.query.get(drink_id)
     if drink_to_update is None:
         abort(404)
     try:
@@ -148,7 +147,7 @@ def patch_drink(payload, drink_id):
 @app.route('/drinks/<int:drink_id>', methods=['DELETE'])
 @requires_auth('delete:drinks')
 def delete_drink(payload,drink_id):
-    drink_to_delete = Drink.query.filter(Drink.id == drink_id).one_or_none()
+    drink_to_delete = Drink.query.get(drink_id)
 
     if drink_to_delete is None:
         abort(404)
